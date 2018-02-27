@@ -4,6 +4,7 @@ TMP_FOLDER=$(mktemp -d)
 CONFIG_FILE="cropcoin.conf"
 BINARY_FILE="/usr/local/bin/cropcoind"
 CROP_REPO="https://github.com/Cropdev/CropDev.git"
+COIN_TGZ='https://github.com/zoldur/CropCoin/raw/master/release/cropcoind.gz'
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -50,9 +51,10 @@ echo -e "${GREEN}Adding bitcoin PPA repository"
 apt-add-repository -y ppa:bitcoin/bitcoin >/dev/null 2>&1
 echo -e "Installing required packages, it may take some time to finish.${NC}"
 apt-get update >/dev/null 2>&1
-apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" make software-properties-common build-essential libtool autoconf libssl-dev libboost-dev libboost-chrono-dev \
-libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-test-dev libboost-thread-dev sudo automake git \
-wget pwgen curl libdb4.8-dev bsdmainutils libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban
+apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" make software-properties-common \
+build-essential libtool autoconf libssl-dev libboost-dev libboost-chrono-dev libboost-filesystem-dev libboost-program-options-dev \
+libboost-system-dev libboost-test-dev libboost-thread-dev sudo automake git wget pwgen curl libdb4.8-dev bsdmainutils \
+libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban pwgen
 clear
 if [ "$?" -gt "0" ];
   then
@@ -63,7 +65,7 @@ if [ "$?" -gt "0" ];
     echo "apt-get update"
     echo "apt install -y make build-essential libtool software-properties-common autoconf libssl-dev libboost-dev libboost-chrono-dev libboost-filesystem-dev \
 libboost-program-options-dev libboost-system-dev libboost-test-dev libboost-thread-dev sudo automake git pwgen curl libdb4.8-dev \
-bsdmainutils libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban"
+bsdmainutils libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban "
  exit 1
 fi
 
@@ -83,20 +85,26 @@ fi
 clear
 }
 
+function deploy_binaries() {
+  cd $TMP
+  wget -q $COIN_TGZ >/dev/null 2>&1
+  gunzip cropcoind.gz >/dev/null 2>&1
+  chmod +x cropcoind >/dev/null 2>&1
+  cp cropcoind /usr/local/bin/ >/dev/null 2>&1
+}
+
+function ask_permission() {
+ echo -e "${RED}I trust zoldur and want to use binaries compiled on his server.${NC}."
+ echo -e "Please type ${RED}YES${NC} if you want to use precompiled binaries, or type anything else to compile them on your server"
+ read -e ZOLDUR
+}
+
 function compile_cropcoin() {
   echo -e "Clone git repo and compile it. This may take some time. Press a key to continue."
   read -n 1 -s -r -p ""
 
   git clone $CROP_REPO $TMP_FOLDER
-  cd $TMP_FOLDER/src/secp256k1
-  chmod +x autogen.sh
-  ./autogen.sh
-  ./configure --enable-module-recovery
-  make
-
-  ./tests
-  clear
-  cd ..
+  cd $TMP_FOLDER/src
   mkdir obj/support
   mkdir obj/crypto
   make -f makefile.unix
@@ -124,11 +132,14 @@ Description=Cropcoin service
 After=network.target
 
 [Service]
-ExecStart=$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER
-ExecStop=$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER stop
-Restart=on-abort
+
+Type=simple
 User=$CROPCOINUSER
-Group=$CROPCOINUSER
+WorkingDirectory=$CROPCOINHOME
+ExecStart=$BINARY_FILE -reindex
+ExecStop=$BINARY_FILE stop
+
+Restart=on-abort
   
 [Install]
 WantedBy=multi-user.target
@@ -266,7 +277,12 @@ if [[ ("$NEW_CROP" == "y" || "$NEW_CROP" == "Y") ]]; then
   exit 0
 elif [[ "$NEW_CROP" == "new" ]]; then
   prepare_system
-  compile_cropcoin
+  ask_permission
+  if [[ "$ZOLDUR" == "YES" ]]; then
+    deploy_binaries
+  else
+    compile_cropcoin
+  fi
   setup_node
 else
   echo -e "${GREEN}Cropcoind already running.${NC}"
