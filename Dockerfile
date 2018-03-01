@@ -72,6 +72,7 @@ RUN echo "Configuration file is: ${RED}$CROPCOINFOLDER/$CONFIG_FILE${NC}" >> /ro
 RUN echo "VPS_IP:Pdocker images -q |xargs docker rmiORT ${RED}$(cat ip):$CROPCOINPORT${NC}" >> /root/$CROPCOINUSER.conf
 #RUN echo "MASTERNODE PRIVATEKEY is: ${RED}$CROPCOINKEY${NC}" >> /root/$CROPCOINUSER.conf
 RUN echo "================================================================================================================================" >> /root/$CROPCOINUSER.conf
-
-RUN alias start_cropcoin="sudo -u $CROPCOINUSER $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER"
-#CMD ["sudo -u $CROPCOINUSE", "$BINARY_FILE", "-conf=$CROPCOINFOLDER/$CONFIG_FILE",  "-datadir=$CROPCOINFOLDER"]
+USER $CROPCOINUSE
+RUN alias start_cropcoin="$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER"
+RUN echo "$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER" > $CROPCOINHOME/start.sh && chmode +x $CROPCOINHOME/start.sh
+CMD ["$CROPCOINHOME/start.sh"]

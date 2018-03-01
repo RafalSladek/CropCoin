@@ -16,9 +16,8 @@ bash cropcoin.sh
 wget -q https://raw.githubusercontent.com/zoldur/CropCoin/master/cropcoin_update.sh
 bash cropcoin_update.sh
 ```
-## How to use docker?
-```docker run  -d -p 17720:17720 -p 17721:17721 -v <CROPCOIN_DATA_DIR>:/home/cropcoin/.cropcoin rafalsladek/cropcoin-masternode:latest```
-
+## How to start docker container?
+```docker run -d -p 17720:17720 -p 17721:17721 -v <CROPCOIN_DATA_DIR>:/home/cropcoin/.cropcoin rafalsladek/cropcoin-masternode:latest```
 
 ## Desktop wallet setup  
 
