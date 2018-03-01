@@ -31,7 +31,8 @@ cp -a cropcoind $BINARY_FILE
 RUN env
 ENV CROPCOINHOME "/home/$CROPCOINUSER"
 ENV CROPCOINFOLDER "$CROPCOINHOME/.cropcoin"
-    
+
+RUN apt-get install -y curl
 
 RUN pwgen -s 15 1 > userpass
 RUN useradd -m $CROPCOINUSER  
@@ -74,5 +75,5 @@ RUN echo "VPS_IP:Pdocker images -q |xargs docker rmiORT ${RED}$(cat ip):$CROPCOI
 RUN echo "================================================================================================================================" >> /root/$CROPCOINUSER.conf
 USER $CROPCOINUSE
 RUN alias start_cropcoin="$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER"
-RUN echo "$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER" > $CROPCOINHOME/start.sh && chmode +x $CROPCOINHOME/start.sh
+RUN echo "$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER" > $CROPCOINHOME/start.sh && chmod +x $CROPCOINHOME/start.sh
 CMD ["$CROPCOINHOME/start.sh"]
