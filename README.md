@@ -2,7 +2,7 @@
 Shell script to install a [Cropcoin Masternode](https://bitcointalk.org/index.php?topic=2863802.0) on a Linux server running Ubuntu 16.04. Use it on your own risk.  
 
 ***
-## Installation for v1.0.0.2:  
+## Installation for v1.0.0.2 with shel script:  
 ```
 wget -q https://raw.githubusercontent.com/zoldur/CropCoin/master/cropcoin.sh  
 bash cropcoin.sh
@@ -16,6 +16,9 @@ bash cropcoin.sh
 wget -q https://raw.githubusercontent.com/zoldur/CropCoin/master/cropcoin_update.sh
 bash cropcoin_update.sh
 ```
+## How to use docker?
+```docker run  -d -p 17720:17720 -p 17721:17721 -v <CROPCOIN_DATA_DIR>:/home/cropcoin/.cropcoin rafalsladek/cropcoin-masternode:latest```
+
 
 ## Desktop wallet setup  
 
