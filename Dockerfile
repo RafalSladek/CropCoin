@@ -32,13 +32,13 @@ RUN env
 ENV CROPCOINHOME "/home/$CROPCOINUSER"
 ENV CROPCOINFOLDER "$CROPCOINHOME/.cropcoin"
 
-RUN apt-get install -y curl
-
 RUN pwgen -s 15 1 > userpass
 RUN useradd -m $CROPCOINUSER  
 RUN echo "$CROPCOINUSER:$(cat userpass)" | chpasswd
 RUN mkdir -p $CROPCOINFOLDER
 RUN chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/null
+
+RUN apt-get update && apt-get install -y curl
 
 RUN pwgen -s 8 1 > rpcuser
 RUN pwgen -s 15 1 > rpcpass
@@ -55,6 +55,7 @@ RUN echo "port=${CROPCOINPORT}" >> $CROPCOINFOLDER/$CONFIG_FILE
 RUN sed -i 's/daemon=1/daemon=0/' $CROPCOINFOLDER/$CONFIG_FILE
 RUN echo logtimestamps=1 >> $CROPCOINFOLDER/$CONFIG_FILE
 RUN echo maxconnections=256 >> $CROPCOINFOLDER/$CONFIG_FILE
+
 
 # Masternode
 #RUN $(sudo -u $CROPCOINUSER $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER masternode genkey) > genkey
