@@ -1,11 +1,9 @@
-FROM rafalsladek/bitcoin-docker-base:latest
-WORKDIR /root
+FROM rafalsladek/cropcoin-masternode:base
 
 EXPOSE 17720 17721
 VOLUME [/home/cropcoin/.cropcoin]
 ENV TERM dumb
 
-ENV TMP_FOLDER "/usr/local/src/"
 ENV CONFIG_FILE "cropcoin.conf"
 ENV BINARY_FILE "/usr/local/bin/cropcoind"
 ENV CROP_REPO "https://github.com/Cropdev/CropDev.git"
@@ -15,19 +13,6 @@ ENV NC '\033[0m'
 ENV CROPCOINPORT 17720
 ENV CROPCOINUSER cropcoin
 
-RUN git clone $CROP_REPO $TMP_FOLDER && \ 
-cd $TMP_FOLDER/src/secp256k1 && \
-ls -al && \
-chmod +x autogen.sh && \
-./autogen.sh && \
-./configure --enable-module-recovery && \
-make && \
-./tests && \
-cd .. && \
-mkdir obj/support && \
-mkdir obj/crypto && \
-make -f makefile.unix && \
-cp -a cropcoind $BINARY_FILE
 RUN env
 ENV CROPCOINHOME "/home/$CROPCOINUSER"
 ENV CROPCOINFOLDER "$CROPCOINHOME/.cropcoin"
