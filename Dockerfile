@@ -1,4 +1,4 @@
-FROM rafalsladek/cropcoin-masternode:base
+FROM rafalsladek/cropcoin:base
 
 EXPOSE 17720 17721
 VOLUME [/home/cropcoin/.cropcoin]
