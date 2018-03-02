@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -f Dockerfile -t rafalsladek/cropcoin-masternode:latest .
+docker build -f Dockerfile -t rafalsladek/cropcoin:latest .
