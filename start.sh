@@ -8,12 +8,12 @@ echo
 
 if [[ "$ALLWAYSOVERWRITECONFIG" == "1" ]]; then
     echo "Removing old config file..."
-    rm $CROPCOINFOLDER/$CONFIG_FILE >/dev/null
+    rm -f -- $CROPCOINFOLDER/$CONFIG_FILE >/dev/null
 fi
 
 echo
 echo "Unlocking daemon..."
-rm $CROPCOINFOLDER/.lock >/dev/null
+rm -f -- $CROPCOINFOLDER/.lock >/dev/null
 echo
 echo "Genereting rpc credentials..."
 pwgen -s 8 1 > rpcuser
@@ -60,12 +60,22 @@ echo
 $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER && sleep 5
 echo
 echo "Unlocking wallet..."
-$BINARY_FILE walletpassphrase $WALLETPASS 9999999999 && sleep 5
+$BINARY_FILE walletpassphrase $WALLETPASS 21000
 echo
-echo "$BINARY_FILE getinfo"
-$BINARY_FILE getinfo && sleep 20
-echo
-echo "$BINARY_FILE getstakinginfo"
-$BINARY_FILE getstakinginfo
 
-tail -f $CROPCOINFOLDER/debug.log
+lock=1
+while [ "$lock" == "1" ]
+do
+    date -u
+    $BINARY_FILE walletpassphrase $WALLETPASS 41000
+    echo
+    echo "$BINARY_FILE getinfo"
+    $BINARY_FILE getinfo
+    echo
+    echo "$BINARY_FILE getstakinginfo"
+    $BINARY_FILE getstakinginfo
+    echo
+    sleep 20
+done
+
+#tail -f $CROPCOINFOLDER/debug.log
