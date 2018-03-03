@@ -5,3 +5,4 @@ cropcoin*.sh
 createContainer.sh
 pushImage.sh
 buildImage-*.sh
+CROPCOIND_DATA_DIR
