@@ -1,4 +1,5 @@
 FROM rafalsladek/cropcoin:base
+LABEL maintainer "rafalsladek <rafalsladek@gmail.com>"
 
 ENV CONFIG_FILE "cropcoin.conf"
 ENV MASTERNODESETUP 0
@@ -16,12 +17,16 @@ RUN mkdir -p $CROPCOINFOLDER && chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/nu
 RUN apt-get update && apt-get install -y curl
 
 WORKDIR $CROPCOINHOME
-EXPOSE $CROPCOINPORT $CROPCOINRPCPORT
+EXPOSE $CROPCOINPORT/tcp $CROPCOINRPCPORT/tcp
 VOLUME $CROPCOINFOLDER
 
-COPY start.sh .
+COPY start.sh $CROPCOINHOME
 RUN chmod +x start.sh && chown -R $CROPCOINUSER: start.sh
 USER $CROPCOINUSER
 ENV PATH $CROPCOINHOME;$PATH
+RUN touch $RANDFILE
+
+HEALTHCHECK --interval=2m --timeout=5s --retries=2 \
+  CMD $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getinfo 
 
 ENTRYPOINT "./start.sh"

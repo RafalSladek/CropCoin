@@ -4,5 +4,7 @@ Dockerfile
 .DS_Store
 .gitignore
 build*.sh
+createContainer.sh
+createContainerNAS.sh
 create*.sh
 cropcoin*.sh

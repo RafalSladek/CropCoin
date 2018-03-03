@@ -3,6 +3,7 @@ build*.sh
 cropcoin*.sh
 
 createContainer.sh
+createContainerNAS.sh
 pushImage.sh
 buildImage-*.sh
 CROPCOIND_DATA_DIR
