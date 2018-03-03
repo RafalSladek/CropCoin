@@ -3,4 +3,6 @@ README.md
 Dockerfile
 .DS_Store
 .gitignore
-*.sh
+build*.sh
+create*.sh
+cropcoin*.sh
