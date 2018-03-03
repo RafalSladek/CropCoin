@@ -1,9 +1,23 @@
 # CropCoin
 Shell script to install a [Cropcoin Masternode](https://bitcointalk.org/index.php?topic=2863802.0) on a Linux server running Ubuntu 16.04. Use it on your own risk.  
 
+## How to generate password?
+```openssl rand -base64 32 | tr -d "=+/" | cut -c1-64```
+
 ## How to start docker container?
+1. before you start encrypt your wallet
+2. create or select <CROPCOIND_DATA_DIR>
+3. copy your wallet.dat file into <CROPCOIND_DATA_DIR>.
+4. run this command
 ```
-docker run -d -p 17720:17720 -p 17721:17721 -v <CROPCOIN_DATA_DIR>:/home/cropcoin/.cropcoin rafalsladek/cropcoin-masternode:latest
+docker run \
+    -it -d \
+    -p 17720:17720 \
+    -p 17721:17721 \
+    -v <CROPCOIND_DATA_DIR>:/home/cropcoin/.cropcoin \
+    -e WALLETPASS=<YOUR_WALLET_PASSWORD>  \
+    --name cropcoin \
+    rafalsladek/cropcoin:latest
 ```
 
 ***
