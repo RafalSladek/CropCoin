@@ -16,7 +16,9 @@ docker run \
     -p 17721:17721 \
     -v $(PWD)/<CROPCOIND_DATA_DIR>:/home/cropcoin/.cropcoin \
     -e WALLETPASS=<YOUR_WALLET_PASSWORD>  \
-    --name cropcoin \
+    --name cropcoin-wallet \
+    --hostname cropcoin-wallet \
+    --restart always \
     rafalsladek/cropcoin:latest
 ```
 
