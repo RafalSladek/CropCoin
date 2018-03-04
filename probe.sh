@@ -5,7 +5,7 @@ set -e
 set -u
 PATH=/bin:/usr/bin:$PATH
 
-stakinginfo=$($BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getstakinginfo > /dev/null 2>&1)
+stakinginfo=$($BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getstakinginfo)
 count_enabled=$(echo $stakinginfo | grep "\"enabled\" : true," | wc -l | tr -d " ")
 count_staking=$(echo $stakinginfo | grep "\"staking\" : true," | wc -l | tr -d " ")
 

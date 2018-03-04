@@ -21,14 +21,14 @@ EXPOSE $CROPCOINPORT/tcp $CROPCOINRPCPORT/tcp
 VOLUME $CROPCOINFOLDER
 
 WORKDIR $CROPCOINHOME
-COPY start.sh .
-COPY probe.sh .
+COPY start.sh $CROPCOINHOME
+COPY probe.sh $CROPCOINHOME
 RUN chmod +x *.sh && chown -R $CROPCOINUSER: *.sh
 USER $CROPCOINUSER
 ENV PATH $CROPCOINHOME;$PATH
 RUN touch $RANDFILE
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD "./probe.sh"
+  CMD "$CROPCOINHOME/probe.sh"
 
-ENTRYPOINT "./start.sh"
+ENTRYPOINT "$CROPCOINHOME/start.sh"
