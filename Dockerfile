@@ -1,5 +1,5 @@
 FROM rafalsladek/cropcoin:base
-LABEL maintainer "rafalsladek <rafalsladek@gmail.com>"
+LABEL maintainer "Rafal Sladek <rafal.sladek@gmail.com>"
 
 ENV CONFIG_FILE "cropcoin.conf"
 ENV MASTERNODESETUP 0
