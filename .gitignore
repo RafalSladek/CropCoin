@@ -1,9 +1,14 @@
-.DS_Store
-build*.sh
-cropcoin*.sh
+# ignore everthing
+*
 
-createContainer.sh
-createContainerNAS.sh
-pushImage.sh
-buildImage-*.sh
-CROPCOIND_DATA_DIR
+# except those here
+!Dockerfile
+!Dockerfile.base
+!start.sh
+!probe.sh
+!.gitignore
+!.dockerignore
+!README.md
+!release
+!cropcoin.sh
+!cropcoin_update.sh
