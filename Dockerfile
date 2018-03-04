@@ -15,20 +15,20 @@ ENV RANDFILE "$CROPCOINHOME/.rnd"
 RUN useradd -m $CROPCOINUSER
 RUN mkdir -p $CROPCOINFOLDER && chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/null
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl && apt-get autoremove
 
-WORKDIR $CROPCOINHOME
 EXPOSE $CROPCOINPORT/tcp $CROPCOINRPCPORT/tcp
 VOLUME $CROPCOINFOLDER
 
-COPY start.sh $CROPCOINHOME
-COPY probe.sh $CROPCOINHOME
+WORKDIR $CROPCOINHOME
+COPY start.sh .
+COPY probe.sh .
 RUN chmod +x *.sh && chown -R $CROPCOINUSER: *.sh
 USER $CROPCOINUSER
 ENV PATH $CROPCOINHOME;$PATH
 RUN touch $RANDFILE
 
-HEALTHCHECK --interval=2m --timeout=5s --retries=2 \
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD "./probe.sh"
 
 ENTRYPOINT "./start.sh"

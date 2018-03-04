@@ -58,25 +58,29 @@ echo "==========================================================================
 echo
 echo "Starting $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER"
 echo
-$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER && sleep 5
+$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER && echo "connecting to blockchain network... "
 echo
-echo "Unlocking wallet..."
-$BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER walletpassphrase $WALLETPASS 21000
-echo
+sleep 5
+UNLOCKED_SEC=20
+SLEEP_SEC=$(( $UNLOCKED_SEC / 2 ))
+PATH=/bin:/usr/bin:$PATH
 
 lock=1
 while [ "$lock" == "1" ]
 do
-    date -u
-    $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER walletpassphrase $WALLETPASS 41000
     echo
-    echo "$BINARY_FILE getinfo"
-    $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getinfo
-    echo
-    echo "$BINARY_FILE getstakinginfo"
-    $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getstakinginfo
-    echo
-    sleep 20
-done
+    echo "$(date -u) unlocking wallet for $UNLOCKED_SEC seconds..."
+    $BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER walletpassphrase $WALLETPASS $UNLOCKED_SEC
+    stakinginfo=$($BINARY_FILE -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER getstakinginfo)
+    count_enabled=$(echo $stakinginfo | grep "\"enabled\" : true," | wc -l | tr -d " ")
+    count_staking=$(echo $stakinginfo | grep "\"staking\" : true," | wc -l | tr -d " ")
 
-#tail -f $CROPCOINFOLDER/debug.log
+    if [ "$count_enabled" = "1" ] && [ "$count_staking" = 1 ]; then
+        echo "$(date -u) wallet enabled & staking"
+    elif [ "$count_enabled" = "1" ] && [ "$count_staking" = 0 ]; then
+        echo "$(date -u) wallet enabled & not staking"
+    elif [ "$count_enabled" = "0" ] && [ "$count_staking" = 0 ]; then
+        echo "$(date -u) wallet not enabled & not staking"
+    fi
+    sleep $SLEEP_SEC
+done
