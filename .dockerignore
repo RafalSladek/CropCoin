@@ -6,3 +6,4 @@ Dockerfile
 build*.sh
 create*.sh
 cropcoin*.sh
+deploy/
