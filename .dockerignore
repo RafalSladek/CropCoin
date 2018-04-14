@@ -8,3 +8,4 @@ createContainer.sh
 createContainerNAS.sh
 create*.sh
 cropcoin*.sh
+deploy/
