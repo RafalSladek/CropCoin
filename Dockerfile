@@ -1,4 +1,6 @@
-FROM rafalsladek/cropcoin:base
+FROM rafalsladek/cropcoin:rspbase
+
+LABEL maintainer "rafalsladek <rafalsladek@gmail.com>"
 
 ENV CONFIG_FILE "cropcoin.conf"
 ENV MASTERNODESETUP 0
@@ -9,19 +11,26 @@ ENV CROPCOINRPCPORT 17721
 ENV CROPCOINUSER cropcoin
 ENV CROPCOINHOME "/home/$CROPCOINUSER"
 ENV CROPCOINFOLDER "$CROPCOINHOME/.cropcoin"
+ENV RANDFILE "$CROPCOINHOME/.rnd"
 
 RUN useradd -m $CROPCOINUSER
 RUN mkdir -p $CROPCOINFOLDER && chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/null
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl && apt-get autoremove
 
-WORKDIR $CROPCOINHOME
-EXPOSE $CROPCOINPORT $CROPCOINRPCPORT
+EXPOSE $CROPCOINPORT/tcp $CROPCOINRPCPORT/tcp
 VOLUME $CROPCOINFOLDER
 
-COPY start.sh .
-RUN chmod +x start.sh && chown -R $CROPCOINUSER: start.sh
+WORKDIR $CROPCOINHOME
+COPY start.sh $CROPCOINHOME
+COPY probe.sh $CROPCOINHOME
+RUN chmod +x *.sh && chown -R $CROPCOINUSER: *.sh
 USER $CROPCOINUSER
 ENV PATH $CROPCOINHOME;$PATH
+RUN touch $RANDFILE
 
-ENTRYPOINT "./start.sh"
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD "$CROPCOINHOME/probe.sh"
+
+ENTRYPOINT "$CROPCOINHOME/start.sh"
+

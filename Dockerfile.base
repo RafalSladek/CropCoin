@@ -1,4 +1,4 @@
-FROM rafalsladek/bitcoin-docker-base:latest
+FROM rafalsladek/bitcoin-docker-base:rsp
  
 ENV TMP_FOLDER "/usr/local/src/"
 ENV BINARY_FILE "/usr/local/bin/cropcoind"
