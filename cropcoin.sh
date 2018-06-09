@@ -33,7 +33,7 @@ fi
 
 if [ -n "$(pidof cropcoind)" ]; then
   echo -e "${GREEN}\c"
-  read -e -p "Cropcoind is already running. Do you want to add another MN? [Y/N]" NEW_CROP
+  echo "Cropcoind is already running."
   echo -e "{NC}"
   clear
 else
@@ -102,7 +102,6 @@ function ask_permission() {
 
 function compile_cropcoin() {
   echo -e "Clone git repo and compile it. This may take some time. Press a key to continue."
-  read -n 1 -s -r -p ""
 
   git clone $CROP_REPO $TMP_FOLDER
   cd $TMP_FOLDER/src
@@ -166,14 +165,12 @@ EOF
 
 function ask_port() {
 DEFAULTCROPCOINPORT=17720
-read -p "CROPCOIN Port: " -i $DEFAULTCROPCOINPORT -e CROPCOINPORT
-: ${CROPCOINPORT:=$DEFAULTCROPCOINPORT}
+CROPCOINPORT=$DEFAULTCROPCOINPORT
 }
 
 function ask_user() {
   DEFAULTCROPCOINUSER="cropcoin"
-  read -p "Cropcoin user: " -i $DEFAULTCROPCOINUSER -e CROPCOINUSER
-  : ${CROPCOINUSER:=$DEFAULTCROPCOINUSER}
+  CROPCOINUSER:=$DEFAULTCROPCOINUSER
 
   if [ -z "$(getent passwd $CROPCOINUSER)" ]; then
     useradd -m $CROPCOINUSER
@@ -182,8 +179,7 @@ function ask_user() {
 
     CROPCOINHOME=$(sudo -H -u $CROPCOINUSER bash -c 'echo $HOME')
     DEFAULTCROPCOINFOLDER="$CROPCOINHOME/.cropcoin"
-    read -p "Configuration folder: " -i $DEFAULTCROPCOINFOLDER -e CROPCOINFOLDER
-    : ${CROPCOINFOLDER:=$DEFAULTCROPCOINFOLDER}
+    CROPCOINFOLDER:=$DEFAULTCROPCOINFOLDER
     mkdir -p $CROPCOINFOLDER
     chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/null
   else
@@ -221,8 +217,6 @@ EOF
 }
 
 function create_key() {
-  echo -e "Enter your ${RED}Masternode Private Key${NC}. Leave it blank to generate a new ${RED}Masternode Private Key${NC} for you:"
-  read -e CROPCOINKEY
   if [[ -z "$CROPCOINKEY" ]]; then
   sudo -u $CROPCOINUSER /usr/local/bin/cropcoind -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER
   sleep 5
@@ -282,12 +276,7 @@ if [[ ("$NEW_CROP" == "y" || "$NEW_CROP" == "Y") ]]; then
   exit 0
 elif [[ "$NEW_CROP" == "new" ]]; then
   prepare_system
-  ask_permission
-  if [[ "$ZOLDUR" == "YES" ]]; then
-    deploy_binaries
-  else
-    compile_cropcoin
-  fi
+  compile_cropcoin
   setup_node
 else
   echo -e "${GREEN}Cropcoind already running.${NC}"
