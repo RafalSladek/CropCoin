@@ -5,12 +5,13 @@ CONFIG_FILE="cropcoin.conf"
 BINARY_FILE="/usr/local/bin/cropcoind"
 CROP_REPO="https://github.com/Cropdev/CropDev.git"
 COIN_TGZ='https://github.com/zoldur/CropCoin/releases/download/v.1.1.0.4/cropcoind.gz'
+TERM=dump
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-
+echo "export TERM=dumb" >> ~/.bashrc
 function compile_error() {
 if [ "$?" -gt "0" ];
  then
