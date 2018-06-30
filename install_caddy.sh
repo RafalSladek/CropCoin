@@ -1,31 +1,46 @@
 #!/bin/bash
 
-curl https://getcaddy.com | bash -s personal hook.service,http.datadog,http.forwardproxy,http.login,http.minify,http.nobots,http.ratelimit
+echo -e "Please type full qualified domain name for this server"
+read -e FQDN
+
+echo -e "Please type host"
+read -e hostname
+
+echo -e "Please type username"
+read -e username
+
+echo -e "Please type password"
+read -e password
+
+echo -e "Please type email"
+read -e email
+
+curl https://getcaddy.com | bash -s personal hook.service,http.basicauth,http.cache,http.datadog,http.forwardproxy,http.gzip,http.login,http.minify,http.markdown,http.minify,http.nobots,http.ratelimit
 
 # config
 mkdir /etc/caddy
 chown -R root:www-data /etc/caddy
 cat << EOF > /etc/caddy/Caddyfile
-alpharack1.crypto-pool.net/monit {
+${FQDN}/monit {
 	gzip
 	log /var/log/caddy/access.log
 	proxy / localhost:2812
-	tls kryptoroger@gmail.com
-	basicauth / user password
+	tls ${email}
+	basicauth / ${username} ${password}
 	datadog {
     		statsd 127.0.0.1:8125
-    		tags loc:alpharack1 usecase:masternode role:monit
+			tags loc:${hostname} usecase:masternode role:monit
   	}
 }
-alpharack1.crypto-pool.net {
+${FQDN} {
 	gzip
 	log /var/log/caddy/access.log
 	root /var/www/html
-	tls kryptoroger@gmail.com
-	basicauth / user password
+	tls ${email}
+	basicauth / ${username} ${password}
 	datadog {
     		statsd 127.0.0.1:8125
-    		tags loc:alpharack1 usecase:masternode role:monit
+			tags loc:${hostname} usecase:masternode role:monit
   	}      
 }
 EOF
