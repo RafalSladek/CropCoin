@@ -4,14 +4,13 @@ TMP_FOLDER=$(mktemp -d)
 CONFIG_FILE="cropcoin.conf"
 BINARY_FILE="/usr/local/bin/cropcoind"
 CROP_REPO="https://github.com/Cropdev/CropDev.git"
-COIN_TGZ='https://github.com/zoldur/CropCoin/releases/download/v.1.1.0.4/cropcoind.gz'
-TERM=dump
+COIN_TGZ='https://github.com/zoldur/CropCoin/releases/download/v.1.1.0.5/cropcoind.gz'
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-echo "export TERM=dumb" >> ~/.bashrc
+
 function compile_error() {
 if [ "$?" -gt "0" ];
  then
@@ -34,7 +33,7 @@ fi
 
 if [ -n "$(pidof cropcoind)" ]; then
   echo -e "${GREEN}\c"
-  echo "Cropcoind is already running."
+  read -e -p "Cropcoind is already running. Do you want to add another MN? [Y/N]" NEW_CROP
   echo -e "{NC}"
   clear
 else
@@ -103,6 +102,7 @@ function ask_permission() {
 
 function compile_cropcoin() {
   echo -e "Clone git repo and compile it. This may take some time. Press a key to continue."
+  read -n 1 -s -r -p ""
 
   git clone $CROP_REPO $TMP_FOLDER
   cd $TMP_FOLDER/src
@@ -145,7 +145,7 @@ TimeoutStopSec=60s
 TimeoutStartSec=10s
 StartLimitInterval=120s
 StartLimitBurst=5
-  
+
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -166,12 +166,14 @@ EOF
 
 function ask_port() {
 DEFAULTCROPCOINPORT=17720
-CROPCOINPORT=$DEFAULTCROPCOINPORT
+read -p "CROPCOIN Port: " -i $DEFAULTCROPCOINPORT -e CROPCOINPORT
+: ${CROPCOINPORT:=$DEFAULTCROPCOINPORT}
 }
 
 function ask_user() {
   DEFAULTCROPCOINUSER="cropcoin"
-  CROPCOINUSER:=$DEFAULTCROPCOINUSER
+  read -p "Cropcoin user: " -i $DEFAULTCROPCOINUSER -e CROPCOINUSER
+  : ${CROPCOINUSER:=$DEFAULTCROPCOINUSER}
 
   if [ -z "$(getent passwd $CROPCOINUSER)" ]; then
     useradd -m $CROPCOINUSER
@@ -180,7 +182,8 @@ function ask_user() {
 
     CROPCOINHOME=$(sudo -H -u $CROPCOINUSER bash -c 'echo $HOME')
     DEFAULTCROPCOINFOLDER="$CROPCOINHOME/.cropcoin"
-    CROPCOINFOLDER:=$DEFAULTCROPCOINFOLDER
+    read -p "Configuration folder: " -i $DEFAULTCROPCOINFOLDER -e CROPCOINFOLDER
+    : ${CROPCOINFOLDER:=$DEFAULTCROPCOINFOLDER}
     mkdir -p $CROPCOINFOLDER
     chown -R $CROPCOINUSER: $CROPCOINFOLDER >/dev/null
   else
@@ -218,6 +221,8 @@ EOF
 }
 
 function create_key() {
+  echo -e "Enter your ${RED}Masternode Private Key${NC}. Leave it blank to generate a new ${RED}Masternode Private Key${NC} for you:"
+  read -e CROPCOINKEY
   if [[ -z "$CROPCOINKEY" ]]; then
   sudo -u $CROPCOINUSER /usr/local/bin/cropcoind -conf=$CROPCOINFOLDER/$CONFIG_FILE -datadir=$CROPCOINFOLDER
   sleep 5
@@ -277,10 +282,14 @@ if [[ ("$NEW_CROP" == "y" || "$NEW_CROP" == "Y") ]]; then
   exit 0
 elif [[ "$NEW_CROP" == "new" ]]; then
   prepare_system
-  compile_cropcoin
+  ask_permission
+  if [[ "$ZOLDUR" == "YES" ]]; then
+    deploy_binaries
+  else
+    compile_cropcoin
+  fi
   setup_node
 else
   echo -e "${GREEN}Cropcoind already running.${NC}"
   exit 0
 fi
-
